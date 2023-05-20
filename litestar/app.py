@@ -350,7 +350,7 @@ class Litestar(Router):
             on_app_init or [],
             (p.on_app_init for p in config.plugins if isinstance(p, InitPluginProtocol)),
         ):
-            config = handler(config)
+            config = handler(config)  # pyright: ignore
 
         self._openapi_schema: OpenAPI | None = None
         self._debug: bool = True
@@ -487,14 +487,12 @@ class Litestar(Router):
             for hook in self.on_shutdown[::-1]:
                 exit_stack.push_async_callback(partial(self._call_lifespan_hook, hook))
 
-            exit_stack.push_async_callback(self.event_emitter.on_shutdown)
+            await exit_stack.enter_async_context(self.event_emitter)
 
             for manager in self._lifespan_managers:
                 if not isinstance(manager, AbstractAsyncContextManager):
                     manager = manager(self)
                 await exit_stack.enter_async_context(manager)
-
-            await self.event_emitter.on_startup()
 
             for hook in self.on_startup:
                 await self._call_lifespan_hook(hook)
@@ -726,7 +724,7 @@ class Litestar(Router):
             asgi_handler = CORSMiddleware(app=asgi_handler, config=self.cors_config)
 
         return wrap_in_exception_handler(
-            debug=self.debug, app=asgi_handler, exception_handlers=self.exception_handlers or {}
+            debug=self.debug, app=asgi_handler, exception_handlers=self.exception_handlers or {}  # pyright: ignore
         )
 
     def _wrap_send(self, send: Send, scope: Scope) -> Send:

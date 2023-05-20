@@ -219,6 +219,17 @@ class Converter(cattrs.Converter):
             False,
         )
 
+        # ensure attrs instances are not unstructured into dict
+        self.register_unstructure_hook_factory(
+            # the first parameter is a predicate that tests the value. In this case we are testing for an attrs
+            # decorated class that does not have the AttrsSignatureModel anywhere in its mro chain.
+            lambda x: attrs.has(x) and AttrsSignatureModel not in list(x.__mro__),
+            # the "unstructuring" hook we are registering is a lambda that receives the class constructor and returns
+            # another lambda that will take a value and receive it unmodified.
+            # this is a hack to ensure that no attrs constructors are called during unstructuring.
+            lambda x: lambda x: x,
+        )
+
         for cls, structure_hook in hooks:
             self.register_structure_hook(cls, structure_hook)
             self.register_unstructure_hook(cls, _pass_through_unstructure_hook)

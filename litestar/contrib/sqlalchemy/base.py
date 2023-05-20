@@ -86,23 +86,21 @@ class ModelProtocol(Protocol):
         ...
 
 
-@declarative_mixin
 class UUIDPrimaryKey:
     """UUID Primary Key Field Mixin."""
 
     __abstract__ = True
 
-    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)
+    id: Mapped[UUID] = mapped_column(default=uuid4, primary_key=True)  # pyright: ignore
     """UUID Primary key column."""
 
 
-@declarative_mixin
 class BigIntPrimaryKey:
     """BigInt Primary Key Field Mixin."""
 
     __abstract__ = True
 
-    id: Mapped[int] = mapped_column(BigIntIdentity, Identity(always=True), primary_key=True)
+    id: Mapped[int] = mapped_column(BigIntIdentity, Identity(always=True), primary_key=True)  # pyright: ignore
     """BigInt Primary key column."""
 
 
@@ -112,13 +110,12 @@ class AuditColumns:
 
     __abstract__ = True
 
-    created: Mapped[datetime] = mapped_column(default=datetime.now)
+    created: Mapped[datetime] = mapped_column(default=datetime.now)  # pyright: ignore
     """Date/time of instance creation."""
-    updated: Mapped[datetime] = mapped_column(default=datetime.now)
+    updated: Mapped[datetime] = mapped_column(default=datetime.now)  # pyright: ignore
     """Date/time of instance last update."""
 
 
-@declarative_mixin
 class CommonTableAttributes:
     """Common attributes for SQLALchemy tables."""
 
